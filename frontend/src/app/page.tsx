@@ -6,9 +6,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 
+const urlLinks = [
+  "https://example.com/source1",
+  "https://example.com/source2"
+]
+
 export default function ContentAnalyzer() {
   const [selectedTool, setSelectedTool] = useState('plagiarism')
-  const [urlLinks, setUrlLinks] = useState<string[]>([])
+  // const [urlLinks, setUrlLinks] = useState<string[]>([])
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-50">
