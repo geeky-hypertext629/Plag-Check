@@ -30,6 +30,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.16",
     "uuid": "^11.0.3",
     "zod": "^3.24.1"

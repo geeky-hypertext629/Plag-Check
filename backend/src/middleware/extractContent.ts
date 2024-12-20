@@ -32,7 +32,6 @@ class Middleware{
                 if (!bodyValidation.success) {
                     return res.status(400).json({ error: "Content format is invalid", details: bodyValidation.error });
                 }
-    
                 req.body.content = Middleware.processContent(contentFormat, req.body.content);
             } else {
                 const bodyValidation = MatchSchema.safeParse(req.body);
