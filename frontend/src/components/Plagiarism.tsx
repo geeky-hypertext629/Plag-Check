@@ -3,7 +3,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BarChart, ChevronDown } from "lucide-react";
+import { PieChart, Cell, Legend } from "recharts";
+import { Sun, Moon, FileDown } from "lucide-react";
 
 interface PlagiarismFound {
     startIndex: number;
@@ -32,6 +33,11 @@ interface ScanResult {
     similarWordCounts: number;
 }
 
+interface ChartData {
+    name: string;
+    value: number;
+}
+
 const Plagiarism = () => {
     const [textContent, setTextContent] = useState("");
     const [topSources, setTopSources] = useState<Source[]>([]);
@@ -40,6 +46,7 @@ const Plagiarism = () => {
     const [selectedSource, setSelectedSource] = useState<number | null>(null);
     const [highlightedText, setHighlightedText] = useState("");
     const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const handleScan = async () => {
         if (!textContent.trim()) {
@@ -129,8 +136,130 @@ const Plagiarism = () => {
         setHighlightedText(result);
     };
 
+    const exportReport = () => {
+        if (!scanResult) return;
+
+        const report = `
+Plagiarism Analysis Report
+-------------------------
+Date: ${new Date().toLocaleDateString()}
+Time: ${new Date().toLocaleTimeString()}
+
+Overall Similarity: ${scanResult.score}%
+Total Words: ${scanResult.textWordCounts}
+Matching Words: ${scanResult.totalPlagiarismWords}
+Identical Words: ${scanResult.identicalWordCounts}
+Similar Words: ${scanResult.similarWordCounts}
+
+Top Sources:
+${topSources
+    .map(
+        (source, index) => `
+${index + 1}. ${source.url}
+   Similarity: ${source.percentage}%
+   Title: ${source.title}
+   Description: ${source.description}
+`
+    )
+    .join("\n")}
+
+Analyzed Text:
+${textContent}
+        `;
+
+        const blob = new Blob([report], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "plagiarism-report.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    const getScoreColor = (score: number) => {
+        if (score <= 20) return "#22c55e";
+        if (score <= 50) return "#eab308";
+        return "#ef4444";
+    };
+
+    const renderScoreIndicator = () => {
+        if (!scanResult) return null;
+
+        const score = scanResult.score;
+        const color = getScoreColor(score);
+
+        return (
+            <div className="flex flex-col items-center p-6">
+                <div className={`text-4xl font-bold mb-2`} style={{ color }}>
+                    {score}%
+                </div>
+                <div className="text-sm text-gray-600">Overall Similarity</div>
+                <div
+                    className="w-full h-2 bg-gray-200 rounded-full mt-2"
+                    style={{
+                        background: `linear-gradient(to right, ${color} ${score}%, #e5e7eb ${score}%)`,
+                    }}
+                />
+            </div>
+        );
+    };
+
+    const renderContentStats = () => {
+        if (!scanResult) return null;
+
+        const stats = [
+            { label: "Total Words", value: scanResult.textWordCounts },
+            { label: "Matching Words", value: scanResult.totalPlagiarismWords },
+            { label: "Identical Words", value: scanResult.identicalWordCounts },
+            { label: "Similar Words", value: scanResult.similarWordCounts },
+        ];
+
+        return (
+            <div className="grid grid-cols-2 gap-4 p-4">
+                {stats.map((stat, index) => (
+                    <div key={index} className="text-center">
+                        <div className="text-2xl font-bold">{stat.value}</div>
+                        <div className="text-sm text-gray-600">
+                            {stat.label}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     return (
-        <div className="space-y-6 p-4 max-w-4xl mx-auto">
+        <div
+            className={`space-y-6 p-4 max-w-4xl mx-auto ${
+                isDarkMode ? "dark" : ""
+            }`}
+        >
+            {/* Header with Dark Mode Toggle */}
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold">Plagiarism Checker</h2>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsDarkMode(!isDarkMode)}
+                >
+                    {isDarkMode ? (
+                        <Sun className="h-4 w-4" />
+                    ) : (
+                        <Moon className="h-4 w-4" />
+                    )}
+                </Button>
+            </div>
+
+            {/* Results Summary */}
+            {scanResult && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>{renderScoreIndicator()}</Card>
+                    <Card>{renderContentStats()}</Card>
+                </div>
+            )}
+
             {/* Text Content Display */}
             <div className="space-y-2">
                 <label className="text-sm font-medium">Text Content</label>
@@ -152,7 +281,7 @@ const Plagiarism = () => {
                 )}
             </div>
 
-            {/* File Upload and URL Paste */}
+            {/* Action Buttons */}
             <div className="flex gap-2">
                 <Button variant="outline" className="flex-1">
                     <label className="cursor-pointer">
@@ -168,9 +297,14 @@ const Plagiarism = () => {
                 <Button variant="outline" className="flex-1">
                     Paste URL
                 </Button>
+                {scanResult && (
+                    <Button variant="outline" onClick={exportReport}>
+                        <FileDown className="w-4 h-4 mr-2" />
+                        Export Report
+                    </Button>
+                )}
             </div>
 
-            {/* Scan Button */}
             <Button
                 className="w-full"
                 onClick={handleScan}
@@ -179,45 +313,10 @@ const Plagiarism = () => {
                 {isLoading ? "Scanning..." : "Scan Now"}
             </Button>
 
-            {/* Error Message */}
             {error && (
                 <Alert variant="destructive">
                     <AlertDescription>{error}</AlertDescription>
                 </Alert>
-            )}
-
-            {/* Scan Results Summary */}
-            {scanResult && (
-                <Card className="bg-gray-50">
-                    <CardContent className="pt-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                                <div className="text-2xl font-bold text-blue-600">
-                                    {scanResult.score}%
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                    Overall Similarity
-                                </div>
-                            </div>
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                                <div className="text-2xl font-bold text-green-600">
-                                    {scanResult.textWordCounts}
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                    Total Words
-                                </div>
-                            </div>
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                                <div className="text-2xl font-bold text-orange-600">
-                                    {scanResult.totalPlagiarismWords}
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                    Matching Words
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
             )}
 
             {/* Results */}
