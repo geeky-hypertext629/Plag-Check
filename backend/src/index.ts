@@ -5,13 +5,15 @@ import cookieParser from "cookie-parser";
 import { v4 as uuidv4 } from 'uuid';
 import { redisClient } from './config/redis.config';
 import dotenv from 'dotenv';
+import { plagRouter } from './route';
 
 dotenv.config();
 
-import PlagirismController from './controller/plagiarism.controller';
-import MatchController from './controller/match.controller';
-import AiDetectController from './controller/aidetect.controller';
+
 import Middleware from './middleware';
+import KafkaMiddleware from './middleware/kafka.middleware';
+import { connectConsumer } from './config/kafka.config';
+import KafkaController from './controller/kafka.controller';
 
 async function init() {
     const app = express()
@@ -32,7 +34,7 @@ async function init() {
 
     app.use(async (req, res, next) => {
         let token = req.cookies.plagToken;
-        console.log('Token:', token);
+        // console.log('Token:', token);
         if (!token) {
             token = uuidv4();
             res.cookie('plagToken', token, { httpOnly: true, secure: true, expires: new Date(Date.now() + 60 * 60 * 1000) });
@@ -44,10 +46,10 @@ async function init() {
         console.log('User Token:', token);
         next();
     });
-
-    app.route('/plag-detect').post(Middleware.checkCredit,Middleware.extractContent, PlagirismController.submitContent).get();
-    app.route('/ai-content').post(Middleware.extractContent, AiDetectController.submitContent).get();
-    app.route('/match-content').post(Middleware.extractContent, MatchController.submitContent).get();
+    app.use('/v1',KafkaController.producer);
+    app.route('/admin').post(KafkaController.createTopic);
+   
+    await connectConsumer();
 
     app.get('/', (req, res) => {
         return res.status(200).json({ message: 'This is plag check server' });

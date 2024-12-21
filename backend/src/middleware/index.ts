@@ -19,7 +19,7 @@ class Middleware{
     
     public static async extractContent(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log("Request",req.body,req.query);
+            // console.log("Request",req.body,req.query);
             const headerValidation = RequestSchema.safeParse(req.query);
             if (!headerValidation.success) {
                 return res.status(400).json({ error: "Query need to be provided", details: headerValidation.error });
@@ -33,7 +33,6 @@ class Middleware{
                 if (!bodyValidation.success) {
                     return res.status(400).json({ error: "Content format is invalid", details: bodyValidation.error });
                 }
-    
                 req.body.content = Middleware.processContent(contentFormat, req.body.content);
             } else {
                 const bodyValidation = MatchSchema.safeParse(req.body);
@@ -44,7 +43,6 @@ class Middleware{
                 req.body.contentA = Middleware.processContent(contentFormat, req.body.contentA);
                 req.body.contentB = Middleware.processContent(contentFormat, req.body.contentB);
             }
-            console.log("Request",req.body,req.query);
 
             next();
         } catch (err:any) {
@@ -60,6 +58,7 @@ class Middleware{
             return res.status(400).json({ error: "Token is missing" });
         }
         redisClient.get(token).then((reply: string | null) => {
+            console.log("The reply is ",reply);
             if (!reply) {
                 return res.status(400).json({ error: "Token is invalid" });
             }
