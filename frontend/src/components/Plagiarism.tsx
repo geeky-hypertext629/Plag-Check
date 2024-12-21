@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BarChart, ChevronDown } from "lucide-react";
 
 interface PlagiarismFound {
     startIndex: number;
@@ -13,6 +16,20 @@ interface Source {
     plagiarismWords: number;
     percentage?: string;
     plagiarismFound: PlagiarismFound[];
+    description: string;
+    title: string;
+    publishedDate: string;
+    source: string;
+    author: string;
+}
+
+interface ScanResult {
+    score: number;
+    sourceCounts: number;
+    textWordCounts: number;
+    totalPlagiarismWords: number;
+    identicalWordCounts: number;
+    similarWordCounts: number;
 }
 
 const Plagiarism = () => {
@@ -22,6 +39,7 @@ const Plagiarism = () => {
     const [error, setError] = useState<string | null>(null);
     const [selectedSource, setSelectedSource] = useState<number | null>(null);
     const [highlightedText, setHighlightedText] = useState("");
+    const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 
     const handleScan = async () => {
         if (!textContent.trim()) {
@@ -44,6 +62,7 @@ const Plagiarism = () => {
 
             const sources: Source[] = data?.data?.sources || [];
             const textWordCounts = data?.data?.result?.textWordCounts || 1;
+            setScanResult(data?.data?.result || null);
 
             const processedSources = sources
                 .filter((source) => source.plagiarismWords > 0)
@@ -87,12 +106,9 @@ const Plagiarism = () => {
             return;
         }
 
-        // Sort plagiarism found segments by start index
         const segments = [...source.plagiarismFound].sort(
             (a, b) => a.startIndex - b.startIndex
         );
-
-        // Build highlighted text by inserting markers
         let result = textContent;
         let offset = 0;
 
@@ -114,7 +130,7 @@ const Plagiarism = () => {
     };
 
     return (
-        <div className="space-y-6 p-4 max-w-2xl mx-auto">
+        <div className="space-y-6 p-4 max-w-4xl mx-auto">
             {/* Text Content Display */}
             <div className="space-y-2">
                 <label className="text-sm font-medium">Text Content</label>
@@ -164,7 +180,45 @@ const Plagiarism = () => {
             </Button>
 
             {/* Error Message */}
-            {error && <div className="text-red-500 text-sm">{error}</div>}
+            {error && (
+                <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            {/* Scan Results Summary */}
+            {scanResult && (
+                <Card className="bg-gray-50">
+                    <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                                <div className="text-2xl font-bold text-blue-600">
+                                    {scanResult.score}%
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Overall Similarity
+                                </div>
+                            </div>
+                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                                <div className="text-2xl font-bold text-green-600">
+                                    {scanResult.textWordCounts}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Total Words
+                                </div>
+                            </div>
+                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                                <div className="text-2xl font-bold text-orange-600">
+                                    {scanResult.totalPlagiarismWords}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Matching Words
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Results */}
             <div className="space-y-4">
@@ -172,26 +226,59 @@ const Plagiarism = () => {
                 <div className="space-y-2">
                     {topSources.length > 0 ? (
                         topSources.map((source, index) => (
-                            <div
+                            <Card
                                 key={index}
-                                className={`p-2 rounded text-sm flex justify-between items-center cursor-pointer transition-colors ${
+                                className={`cursor-pointer transition-colors ${
                                     selectedSource === index
-                                        ? "bg-blue-100 border-blue-300"
-                                        : "bg-gray-100 hover:bg-gray-200"
+                                        ? "bg-blue-50 border-blue-200"
+                                        : "hover:bg-gray-50"
                                 }`}
                                 onClick={() => handleSourceSelect(index)}
                             >
-                                <a
-                                    href={source.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    {source.url}
-                                </a>
-                                <span>{source.percentage}%</span>
-                            </div>
+                                <CardContent className="p-4">
+                                    <div className="flex justify-between items-start">
+                                        <div className="space-y-1">
+                                            <div className="font-medium">
+                                                {source.title || source.url}
+                                            </div>
+                                            <a
+                                                href={source.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-blue-500 hover:underline"
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                {source.url}
+                                            </a>
+                                            {source.description && (
+                                                <p className="text-sm text-gray-600 mt-2">
+                                                    {source.description}
+                                                </p>
+                                            )}
+                                            <div className="flex gap-4 text-sm text-gray-500 mt-2">
+                                                {source.author !==
+                                                    "unknown" && (
+                                                    <span>
+                                                        Author: {source.author}
+                                                    </span>
+                                                )}
+                                                {source.publishedDate !==
+                                                    "unknown" && (
+                                                    <span>
+                                                        Published:{" "}
+                                                        {source.publishedDate}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="text-lg font-bold text-blue-600">
+                                            {source.percentage}%
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         ))
                     ) : (
                         <div className="text-sm text-gray-500 italic">
