@@ -147,15 +147,15 @@ Similar Words: ${scanResult.similarWordCounts}
 
 Top Sources:
 ${topSources
-    .map(
-        (source, index) => `
+                .map(
+                    (source, index) => `
 ${index + 1}. ${source.url}
    Similarity: ${source.percentage}%
    Title: ${source.title}
    Description: ${source.description}
 `
-    )
-    .join("\n")}
+                )
+                .join("\n")}
 
 Analyzed Text:
 ${textContent}
@@ -226,9 +226,8 @@ ${textContent}
 
     return (
         <div
-            className={`space-y-6 p-4 max-w-4xl mx-auto ${
-                isDarkMode ? "dark" : ""
-            }`}
+            className={`space-y-6 p-4 max-w-4xl mx-auto ${isDarkMode ? "dark" : ""
+                }`}
         >
             {/* Header with Dark Mode Toggle */}
             <div className="flex justify-between items-center">
@@ -309,9 +308,17 @@ ${textContent}
                 )}
             </div>
 
+
+            {/* OR Divider */}
+            <div className="flex items-center my-4">
+                <div className="flex-grow border-t border-gray-300"></div>
+                <span className="mx-4 text-gray-500 text-sm font-medium">OR</span>
+                <div className="flex-grow border-t border-gray-300"></div>
+            </div>
+
             {/* Action Buttons */}
-            <div className="flex gap-2">
-                <Button variant="outline" className="flex-1">
+            <div className="flex justify-center items-center h-full">
+                <Button variant="outline" className="w-64">
                     <label className="cursor-pointer">
                         <input
                             type="file"
@@ -322,9 +329,9 @@ ${textContent}
                         Upload File
                     </label>
                 </Button>
-                <Button variant="outline" className="flex-1">
+                {/* <Button variant="outline" className="flex-1">
                     Paste URL
-                </Button>
+                </Button> */}
                 {scanResult && (
                     <Button variant="outline" onClick={exportReport}>
                         <FileDown className="w-4 h-4 mr-2" />
@@ -355,11 +362,10 @@ ${textContent}
                         topSources.map((source, index) => (
                             <Card
                                 key={index}
-                                className={`cursor-pointer transition-colors hover ${
-                                    selectedSource === index
+                                className={`cursor-pointer transition-colors hover ${selectedSource === index
                                         ? "bg-blue-50 border-blue-200"
                                         : "hover:bg-gray-50"
-                                }`}
+                                    }`}
                                 onClick={() => handleSourceSelect(index)}
                             >
                                 <CardContent className="p-4">
@@ -387,17 +393,17 @@ ${textContent}
                                             <div className="flex gap-4 text-sm text-gray-500 mt-2">
                                                 {source.author !==
                                                     "unknown" && (
-                                                    <span>
-                                                        Author: {source.author}
-                                                    </span>
-                                                )}
+                                                        <span>
+                                                            Author: {source.author}
+                                                        </span>
+                                                    )}
                                                 {source.publishedDate !==
                                                     "unknown" && (
-                                                    <span>
-                                                        Published:{" "}
-                                                        {source.publishedDate}
-                                                    </span>
-                                                )}
+                                                        <span>
+                                                            Published:{" "}
+                                                            {source.publishedDate}
+                                                        </span>
+                                                    )}
                                             </div>
                                         </div>
                                         <div className="text-lg font-bold text-blue-600">
