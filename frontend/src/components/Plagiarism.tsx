@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Sun, Moon, FileDown } from "lucide-react";
+import { FileDown } from "lucide-react";
 
 interface PlagiarismFound {
     startIndex: number;
