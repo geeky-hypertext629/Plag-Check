@@ -52,7 +52,7 @@ const Plagiarism = () => {
         setError(null);
         try {
             const response = await fetch(
-                "https://plag-check-h7lh.vercel.app/plag-detect?contentFormat=text&checkOption=plagiarism",
+                "http://localhost:5000/plag-detect?contentFormat=text&checkOption=plagiarism",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
