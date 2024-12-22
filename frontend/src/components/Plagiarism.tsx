@@ -283,7 +283,7 @@ ${textContent}
                                 <div className="text-2xl font-bold text-orange-600">
                                     {scanResult.totalPlagiarismWords}
                                 </div>
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm text-gray-00">
                                     Matching Words
                                 </div>
                             </div>
@@ -369,11 +369,14 @@ ${textContent}
                             <Card
                                 key={index}
                                 className={`cursor-pointer transition-colors hover ${selectedSource === index
-                                    ? "bg-blue-50 border-blue-200"
-                                    : "hover:bg-gray-50"
-                                    }`}
+                                        ? "bg-blue-50 border-blue-200"
+                                        : isDarkMode
+                                            ? "hover:bg-gray-900"
+                                            : "hover:bg-gray-50"
+                                    } ${isDarkMode ? "bg-gray-950" : "hover:bg-gray-300"}`}
                                 onClick={() => handleSourceSelect(index)}
                             >
+
                                 <CardContent className="p-4">
                                     <div className="flex justify-between items-start">
                                         <div className="space-y-1">
