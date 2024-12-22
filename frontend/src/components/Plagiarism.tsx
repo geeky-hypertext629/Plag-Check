@@ -32,7 +32,8 @@ interface ScanResult {
     similarWordCounts: number;
 }
 
-const Plagiarism = () => {
+const Plagiarism = ({ isDarkMode }: { isDarkMode: boolean }) => {
+
     const [textContent, setTextContent] = useState("");
     const [topSources, setTopSources] = useState<Source[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +41,7 @@ const Plagiarism = () => {
     const [selectedSource, setSelectedSource] = useState<number | null>(null);
     const [highlightedText, setHighlightedText] = useState("");
     const [scanResult, setScanResult] = useState<ScanResult | null>(null);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    // const [isDarkMode, setIsDarkMode] = useState(false);
 
     const handleScan = async () => {
         if (!textContent.trim()) {
@@ -52,7 +53,7 @@ const Plagiarism = () => {
         setError(null);
         try {
             const response = await fetch(
-                "https://plag-check-h7lh.vercel.app/plag-detect?contentFormat=text&checkOption=plagiarism",
+                "http://localhost:5000/plag-detect?contentFormat=text&checkOption=plagiarism",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -147,15 +148,15 @@ Similar Words: ${scanResult.similarWordCounts}
 
 Top Sources:
 ${topSources
-    .map(
-        (source, index) => `
+                .map(
+                    (source, index) => `
 ${index + 1}. ${source.url}
    Similarity: ${source.percentage}%
    Title: ${source.title}
    Description: ${source.description}
 `
-    )
-    .join("\n")}
+                )
+                .join("\n")}
 
 Analyzed Text:
 ${textContent}
@@ -226,9 +227,8 @@ ${textContent}
 
     return (
         <div
-            className={`space-y-6 p-4 max-w-4xl mx-auto ${
-                isDarkMode ? "dark" : ""
-            }`}
+            className={`space-y-6 p-4 max-w-4xl mx-auto ${isDarkMode ? "dark" : ""
+                }`}
         >
             {/* Header with Dark Mode Toggle */}
             <div className="flex justify-between items-center">
@@ -256,30 +256,34 @@ ${textContent}
 
             {/* Scan Results Summary */}
             {scanResult && (
-                <Card className="bg-gray-50">
+                <Card className={`${isDarkMode ? "dark:bg-gray-900/70" : ""
+                    }`}>
                     <CardContent className="pt-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                            <div className={`text-center p-4 rounded-lg shadow-sm ${isDarkMode ? "border dark:bg-gray-900/70 border-gray-700" : ""
+                                }`}>
                                 <div className="text-2xl font-bold text-blue-600">
                                     {scanResult.score}%
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-500">
                                     Overall Similarity
                                 </div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                            <div className={`text-center p-4 rounded-lg shadow-sm ${isDarkMode ? "border dark:bg-gray-900/70 border-gray-700" : ""
+                                }`}>
                                 <div className="text-2xl font-bold text-green-600">
                                     {scanResult.textWordCounts}
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-500">
                                     Total Words
                                 </div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                            <div className={`text-center p-4 rounded-lg shadow-sm ${isDarkMode ? "border dark:bg-gray-900/70 border-gray-700" : ""
+                                }`}>
                                 <div className="text-2xl font-bold text-orange-600">
                                     {scanResult.totalPlagiarismWords}
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-00">
                                     Matching Words
                                 </div>
                             </div>
@@ -293,7 +297,8 @@ ${textContent}
                 <label className="text-sm font-medium">Text Content</label>
                 {topSources.length > 0 ? (
                     <div
-                        className="min-h-[200px] p-4 border rounded-md bg-white whitespace-pre-wrap"
+                        className={`min-h-[200px] p-4 border rounded-md whitespace-pre-wrap ${isDarkMode ? "dark" : ""
+                            }`}
                         dangerouslySetInnerHTML={{ __html: highlightedText }}
                     />
                 ) : (
@@ -309,9 +314,17 @@ ${textContent}
                 )}
             </div>
 
+
+            {/* OR Divider */}
+            <div className="flex items-center my-4">
+                <div className="flex-grow border-t border-gray-300"></div>
+                <span className="mx-4 text-gray-500 text-sm font-medium">OR</span>
+                <div className="flex-grow border-t border-gray-300"></div>
+            </div>
+
             {/* Action Buttons */}
-            <div className="flex gap-2">
-                <Button variant="outline" className="flex-1">
+            <div className="flex justify-center items-center h-full">
+                <Button variant="outline" className="w-64">
                     <label className="cursor-pointer">
                         <input
                             type="file"
@@ -322,9 +335,9 @@ ${textContent}
                         Upload File
                     </label>
                 </Button>
-                <Button variant="outline" className="flex-1">
+                {/* <Button variant="outline" className="flex-1">
                     Paste URL
-                </Button>
+                </Button> */}
                 {scanResult && (
                     <Button variant="outline" onClick={exportReport}>
                         <FileDown className="w-4 h-4 mr-2" />
@@ -355,13 +368,15 @@ ${textContent}
                         topSources.map((source, index) => (
                             <Card
                                 key={index}
-                                className={`cursor-pointer transition-colors hover ${
-                                    selectedSource === index
+                                className={`cursor-pointer transition-colors hover ${selectedSource === index
                                         ? "bg-blue-50 border-blue-200"
-                                        : "hover:bg-gray-50"
-                                }`}
+                                        : isDarkMode
+                                            ? "hover:bg-gray-900"
+                                            : "hover:bg-gray-50"
+                                    } ${isDarkMode ? "bg-gray-950" : "hover:bg-gray-300"}`}
                                 onClick={() => handleSourceSelect(index)}
                             >
+
                                 <CardContent className="p-4">
                                     <div className="flex justify-between items-start">
                                         <div className="space-y-1">
@@ -387,17 +402,17 @@ ${textContent}
                                             <div className="flex gap-4 text-sm text-gray-500 mt-2">
                                                 {source.author !==
                                                     "unknown" && (
-                                                    <span>
-                                                        Author: {source.author}
-                                                    </span>
-                                                )}
+                                                        <span>
+                                                            Author: {source.author}
+                                                        </span>
+                                                    )}
                                                 {source.publishedDate !==
                                                     "unknown" && (
-                                                    <span>
-                                                        Published:{" "}
-                                                        {source.publishedDate}
-                                                    </span>
-                                                )}
+                                                        <span>
+                                                            Published:{" "}
+                                                            {source.publishedDate}
+                                                        </span>
+                                                    )}
                                             </div>
                                         </div>
                                         <div className="text-lg font-bold text-blue-600">
