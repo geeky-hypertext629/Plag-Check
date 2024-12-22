@@ -3,7 +3,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { PieChart, Cell, Legend } from "recharts";
 import { Sun, Moon, FileDown } from "lucide-react";
 
 interface PlagiarismFound {
@@ -33,11 +32,6 @@ interface ScanResult {
     similarWordCounts: number;
 }
 
-interface ChartData {
-    name: string;
-    value: number;
-}
-
 const Plagiarism = () => {
     const [textContent, setTextContent] = useState("");
     const [topSources, setTopSources] = useState<Source[]>([]);
@@ -58,7 +52,7 @@ const Plagiarism = () => {
         setError(null);
         try {
             const response = await fetch(
-                "http://localhost:5000/plag-detect?contentFormat=text&checkOption=plagiarism",
+                "https://plag-check-h7lh.vercel.app/plag-detect?contentFormat=text&checkOption=plagiarism",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -178,57 +172,57 @@ ${textContent}
         URL.revokeObjectURL(url);
     };
 
-    const getScoreColor = (score: number) => {
-        if (score <= 20) return "#22c55e";
-        if (score <= 50) return "#eab308";
-        return "#ef4444";
-    };
+    // const getScoreColor = (score: number) => {
+    //     if (score <= 20) return "#22c55e";
+    //     if (score <= 50) return "#eab308";
+    //     return "#ef4444";
+    // };
 
-    const renderScoreIndicator = () => {
-        if (!scanResult) return null;
+    // const renderScoreIndicator = () => {
+    //     if (!scanResult) return null;
 
-        const score = scanResult.score;
-        const color = getScoreColor(score);
+    //     const score = scanResult.score;
+    //     const color = getScoreColor(score);
 
-        return (
-            <div className="flex flex-col items-center p-6">
-                <div className={`text-4xl font-bold mb-2`} style={{ color }}>
-                    {score}%
-                </div>
-                <div className="text-sm text-gray-600">Overall Similarity</div>
-                <div
-                    className="w-full h-2 bg-gray-200 rounded-full mt-2"
-                    style={{
-                        background: `linear-gradient(to right, ${color} ${score}%, #e5e7eb ${score}%)`,
-                    }}
-                />
-            </div>
-        );
-    };
+    //     return (
+    //         <div className="flex flex-col items-center p-6">
+    //             <div className={`text-4xl font-bold mb-2`} style={{ color }}>
+    //                 {score}%
+    //             </div>
+    //             <div className="text-sm text-gray-600">Overall Similarity</div>
+    //             <div
+    //                 className="w-full h-2 bg-gray-200 rounded-full mt-2"
+    //                 style={{
+    //                     background: `linear-gradient(to right, ${color} ${score}%, #e5e7eb ${score}%)`,
+    //                 }}
+    //             />
+    //         </div>
+    //     );
+    // };
 
-    const renderContentStats = () => {
-        if (!scanResult) return null;
+    // const renderContentStats = () => {
+    //     if (!scanResult) return null;
 
-        const stats = [
-            { label: "Total Words", value: scanResult.textWordCounts },
-            { label: "Matching Words", value: scanResult.totalPlagiarismWords },
-            { label: "Identical Words", value: scanResult.identicalWordCounts },
-            { label: "Similar Words", value: scanResult.similarWordCounts },
-        ];
+    //     const stats = [
+    //         { label: "Total Words", value: scanResult.textWordCounts },
+    //         { label: "Matching Words", value: scanResult.totalPlagiarismWords },
+    //         { label: "Identical Words", value: scanResult.identicalWordCounts },
+    //         { label: "Similar Words", value: scanResult.similarWordCounts },
+    //     ];
 
-        return (
-            <div className="grid grid-cols-2 gap-4 p-4">
-                {stats.map((stat, index) => (
-                    <div key={index} className="text-center">
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <div className="text-sm text-gray-600">
-                            {stat.label}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
-    };
+    //     return (
+    //         <div className="grid grid-cols-2 gap-4 p-4">
+    //             {stats.map((stat, index) => (
+    //                 <div key={index} className="text-center">
+    //                     <div className="text-2xl font-bold">{stat.value}</div>
+    //                     <div className="text-sm text-gray-600">
+    //                         {stat.label}
+    //                     </div>
+    //                 </div>
+    //             ))}
+    //         </div>
+    //     );
+    // };
 
     return (
         <div
@@ -239,7 +233,7 @@ ${textContent}
             {/* Header with Dark Mode Toggle */}
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold">Plagiarism Checker</h2>
-                <Button
+                {/* <Button
                     variant="outline"
                     size="icon"
                     onClick={() => setIsDarkMode(!isDarkMode)}
@@ -249,15 +243,49 @@ ${textContent}
                     ) : (
                         <Moon className="h-4 w-4" />
                     )}
-                </Button>
+                </Button> */}
             </div>
 
             {/* Results Summary */}
-            {scanResult && (
+            {/* {scanResult && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card>{renderScoreIndicator()}</Card>
                     <Card>{renderContentStats()}</Card>
                 </div>
+            )} */}
+
+            {/* Scan Results Summary */}
+            {scanResult && (
+                <Card className="bg-gray-50">
+                    <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                                <div className="text-2xl font-bold text-blue-600">
+                                    {scanResult.score}%
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Overall Similarity
+                                </div>
+                            </div>
+                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                                <div className="text-2xl font-bold text-green-600">
+                                    {scanResult.textWordCounts}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Total Words
+                                </div>
+                            </div>
+                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                                <div className="text-2xl font-bold text-orange-600">
+                                    {scanResult.totalPlagiarismWords}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Matching Words
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             )}
 
             {/* Text Content Display */}
@@ -288,7 +316,7 @@ ${textContent}
                         <input
                             type="file"
                             accept=".txt,.docx,.pdf"
-                            className="hidden"
+                            className="hidden w-full"
                             onChange={handleFileUpload}
                         />
                         Upload File
@@ -306,7 +334,7 @@ ${textContent}
             </div>
 
             <Button
-                className="w-full"
+                className="w-1/2 mx-auto flex"
                 onClick={handleScan}
                 disabled={isLoading}
             >
@@ -327,7 +355,7 @@ ${textContent}
                         topSources.map((source, index) => (
                             <Card
                                 key={index}
-                                className={`cursor-pointer transition-colors ${
+                                className={`cursor-pointer transition-colors hover ${
                                     selectedSource === index
                                         ? "bg-blue-50 border-blue-200"
                                         : "hover:bg-gray-50"
