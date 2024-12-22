@@ -32,7 +32,8 @@ interface ScanResult {
     similarWordCounts: number;
 }
 
-const Plagiarism = () => {
+const Plagiarism = ({ isDarkMode }: { isDarkMode: boolean }) => {
+
     const [textContent, setTextContent] = useState("");
     const [topSources, setTopSources] = useState<Source[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +41,7 @@ const Plagiarism = () => {
     const [selectedSource, setSelectedSource] = useState<number | null>(null);
     const [highlightedText, setHighlightedText] = useState("");
     const [scanResult, setScanResult] = useState<ScanResult | null>(null);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    // const [isDarkMode, setIsDarkMode] = useState(false);
 
     const handleScan = async () => {
         if (!textContent.trim()) {
@@ -255,30 +256,34 @@ ${textContent}
 
             {/* Scan Results Summary */}
             {scanResult && (
-                <Card className="bg-gray-50">
+                <Card className={`${isDarkMode ? "dark:bg-gray-900/70" : ""
+                    }`}>
                     <CardContent className="pt-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                            <div className={`text-center p-4 rounded-lg shadow-sm ${isDarkMode ? "border dark:bg-gray-900/70 border-gray-700" : ""
+                                }`}>
                                 <div className="text-2xl font-bold text-blue-600">
                                     {scanResult.score}%
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-500">
                                     Overall Similarity
                                 </div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                            <div className={`text-center p-4 rounded-lg shadow-sm ${isDarkMode ? "border dark:bg-gray-900/70 border-gray-700" : ""
+                                }`}>
                                 <div className="text-2xl font-bold text-green-600">
                                     {scanResult.textWordCounts}
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-500">
                                     Total Words
                                 </div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                            <div className={`text-center p-4 rounded-lg shadow-sm ${isDarkMode ? "border dark:bg-gray-900/70 border-gray-700" : ""
+                                }`}>
                                 <div className="text-2xl font-bold text-orange-600">
                                     {scanResult.totalPlagiarismWords}
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-500">
                                     Matching Words
                                 </div>
                             </div>
@@ -292,7 +297,8 @@ ${textContent}
                 <label className="text-sm font-medium">Text Content</label>
                 {topSources.length > 0 ? (
                     <div
-                        className="min-h-[200px] p-4 border rounded-md bg-white whitespace-pre-wrap"
+                        className={`min-h-[200px] p-4 border rounded-md whitespace-pre-wrap ${isDarkMode ? "dark" : ""
+                            }`}
                         dangerouslySetInnerHTML={{ __html: highlightedText }}
                     />
                 ) : (
@@ -363,8 +369,8 @@ ${textContent}
                             <Card
                                 key={index}
                                 className={`cursor-pointer transition-colors hover ${selectedSource === index
-                                        ? "bg-blue-50 border-blue-200"
-                                        : "hover:bg-gray-50"
+                                    ? "bg-blue-50 border-blue-200"
+                                    : "hover:bg-gray-50"
                                     }`}
                                 onClick={() => handleSourceSelect(index)}
                             >

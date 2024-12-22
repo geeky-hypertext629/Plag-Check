@@ -96,7 +96,7 @@ export default function ContentAnalyzer() {
                     className="backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 shadow-2xl border-none rounded-lg hover:scale-[1.02] transition-all duration-300"
                 >
                     <CardContent className="p-10">
-                        {selectedTool === "plagiarism" && <Plagiarism />}
+                        {selectedTool === "plagiarism" && <Plagiarism isDarkMode = {isDarkMode} />}
                         {selectedTool === "summarizer" && <Summarizer />}
                         {selectedTool === "ai-detector" && <AiDetector />}
                     </CardContent>
