@@ -52,7 +52,7 @@ const Plagiarism = ({ isDarkMode }: { isDarkMode: boolean }) => {
 		setError(null);
 		try {
 			const response = await fetch(
-				"http://localhost:5000/plag-detect?contentFormat=text&checkOption=plagiarism",
+				"https://plag-check-be.vercel.app/plag-detect?contentFormat=text&checkOption=plagiarism",
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
