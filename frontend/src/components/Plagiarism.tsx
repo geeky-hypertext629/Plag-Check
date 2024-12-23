@@ -191,7 +191,7 @@ ${textContent}
 
 	return (
 		<div
-			className={`space-y-6 p-4 max-w-4xl mx-auto ${
+			className={`space-y-6 lg:p-4 lg:max-w-4xl lg:mx-auto ${
 				isDarkMode ? "dark" : ""
 			}`}
 		>
@@ -350,7 +350,7 @@ ${textContent}
 						topSources.map((source, index) => (
 							<Card
 								key={index}
-								className={`cursor-pointer transition-colors hover ${
+								className={`cursor-pointer overflow-hidden transition-colors hover ${
 									selectedSource === index
 										? "bg-blue-50 border-blue-200"
 										: isDarkMode
@@ -359,8 +359,8 @@ ${textContent}
 								} ${isDarkMode ? "bg-gray-950" : ""}`}
 								onClick={() => handleSourceSelect(index)}
 							>
-								<CardContent className="p-4">
-									<div className="flex justify-between items-start">
+								<CardContent className="p-3 lg:p-4">
+									<div className="flex flex-wrap text-sm lg:text-lg justify-between items-start ">
 										<div className="space-y-1">
 											<div className="font-medium">
 												{source.title || source.url}
@@ -381,7 +381,7 @@ ${textContent}
 													{source.description}
 												</p>
 											)}
-											<div className="flex gap-4 text-sm text-gray-500 mt-2">
+											<div className="flex flex-wrap gap-4 text-sm text-gray-500 mt-2">
 												{source.author !==
 													"unknown" && (
 													<span>
