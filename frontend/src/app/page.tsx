@@ -60,7 +60,7 @@ export default function ContentAnalyzer() {
             </div>
 
             {/* Main Container */}
-            <div className="max-w-6xl mx-auto space-y-16">
+            <div className="max-w-6xl mx-auto space-y-12">
                 {/* Header Section */}
                 <div className="text-center space-y-4">
                     <h1 className="text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-pink-500 dark:to-yellow-500">

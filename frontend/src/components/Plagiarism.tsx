@@ -265,7 +265,7 @@ ${textContent}
                                 <div className="text-2xl font-bold text-blue-600">
                                     {scanResult.score}%
                                 </div>
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm">
                                     Overall Similarity
                                 </div>
                             </div>
@@ -274,7 +274,7 @@ ${textContent}
                                 <div className="text-2xl font-bold text-green-600">
                                     {scanResult.textWordCounts}
                                 </div>
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm">
                                     Total Words
                                 </div>
                             </div>
@@ -283,7 +283,7 @@ ${textContent}
                                 <div className="text-2xl font-bold text-orange-600">
                                     {scanResult.totalPlagiarismWords}
                                 </div>
-                                <div className="text-sm text-gray-00">
+                                <div className="text-sm">
                                     Matching Words
                                 </div>
                             </div>
