@@ -62,6 +62,11 @@ const Plagiarism = ({ isDarkMode }: { isDarkMode: boolean }) => {
 			);
 			const data = await response.json();
 
+			if (data?.data?.response?.error == "INSUFFICIENT_CREDIT")
+				setError(
+					"Insufficient credits to perform the scan. Please try again later."
+				);
+
 			const sources: Source[] = data?.data?.sources || [];
 			const textWordCounts = data?.data?.result?.textWordCounts || 1;
 			setScanResult(data?.data?.result || null);
@@ -200,6 +205,12 @@ ${textContent}
 			<div className="flex justify-between items-center">
 				<h2 className="text-xl font-bold">Plagiarism Checker</h2>
 			</div>
+
+			{error && (
+				<Alert variant="destructive">
+					<AlertDescription>{error}</AlertDescription>
+				</Alert>
+			)}
 
 			{scanResult && (
 				<>
@@ -366,12 +377,6 @@ ${textContent}
 			>
 				{isLoading ? "Scanning..." : "Scan Now"}
 			</Button>
-
-			{error && (
-				<Alert variant="destructive">
-					<AlertDescription>{error}</AlertDescription>
-				</Alert>
-			)}
 
 			<div className="space-y-4">
 				<h3 className="text-sm font-medium">Top Sources</h3>
