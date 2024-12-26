@@ -41,6 +41,7 @@ const Plagiarism = ({ isDarkMode }: { isDarkMode: boolean }) => {
 	const [highlightedText, setHighlightedText] = useState("");
 	const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
+	const [creditsRemaining, setCreditsRemaining] = useState(0);
 
 	const handleScan = async () => {
 		if (!textContent.trim()) {
@@ -52,7 +53,7 @@ const Plagiarism = ({ isDarkMode }: { isDarkMode: boolean }) => {
 		setError(null);
 		try {
 			const response = await fetch(
-				"https://plag-check-be.vercel.app/plag-detect?contentFormat=text&checkOption=plagiarism",
+				"http://localhost:5000/plag-detect?contentFormat=text&checkOption=plagiarism",
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -81,6 +82,7 @@ const Plagiarism = ({ isDarkMode }: { isDarkMode: boolean }) => {
 			setSelectedSource(null);
 			setHighlightedText(textContent);
 			setIsEditing(false);
+			setCreditsRemaining(data?.data?.credits_remaining || 0);
 		} catch (err) {
 			setError("Failed to fetch data. Please try again later.");
 		} finally {
@@ -200,50 +202,78 @@ ${textContent}
 			</div>
 
 			{scanResult && (
-				<Card className={isDarkMode ? "dark:bg-gray-900/70" : ""}>
-					<CardContent className="pt-6">
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-							<div
-								className={`text-center p-4 rounded-lg shadow-sm ${
-									isDarkMode
-										? "border dark:bg-gray-900/70 border-gray-700"
-										: ""
-								}`}
-							>
-								<div className="text-2xl font-bold text-blue-600">
-									{scanResult.score}%
+				<>
+					<Card className={isDarkMode ? "dark:bg-gray-900/70" : ""}>
+						<CardContent className="pt-6">
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+								<div
+									className={`text-center p-4 rounded-lg shadow-sm ${
+										isDarkMode
+											? "border dark:bg-gray-900/70 border-gray-700"
+											: ""
+									}`}
+								>
+									<div className="text-2xl font-bold text-blue-600">
+										{scanResult.score}%
+									</div>
+									<div className="text-sm">
+										Overall Similarity
+									</div>
 								</div>
-								<div className="text-sm">
-									Overall Similarity
+								<div
+									className={`text-center p-4 rounded-lg shadow-sm ${
+										isDarkMode
+											? "border dark:bg-gray-900/70 border-gray-700"
+											: ""
+									}`}
+								>
+									<div className="text-2xl font-bold text-green-600">
+										{scanResult.textWordCounts}
+									</div>
+									<div className="text-sm">Total Words</div>
+								</div>
+								<div
+									className={`text-center p-4 rounded-lg shadow-sm ${
+										isDarkMode
+											? "border dark:bg-gray-900/70 border-gray-700"
+											: ""
+									}`}
+								>
+									<div className="text-2xl font-bold text-orange-600">
+										{scanResult.totalPlagiarismWords}
+									</div>
+									<div className="text-sm">
+										Matching Words
+									</div>
 								</div>
 							</div>
-							<div
-								className={`text-center p-4 rounded-lg shadow-sm ${
-									isDarkMode
-										? "border dark:bg-gray-900/70 border-gray-700"
-										: ""
-								}`}
-							>
+						</CardContent>
+					</Card>
+
+					{/* Credits Section */}
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+						<Card
+							className={isDarkMode ? "dark:bg-gray-900/70" : ""}
+						>
+							<CardContent className="p-4 text-center">
 								<div className="text-2xl font-bold text-green-600">
-									{scanResult.textWordCounts}
+									{creditsRemaining}
 								</div>
-								<div className="text-sm">Total Words</div>
-							</div>
-							<div
-								className={`text-center p-4 rounded-lg shadow-sm ${
-									isDarkMode
-										? "border dark:bg-gray-900/70 border-gray-700"
-										: ""
-								}`}
-							>
-								<div className="text-2xl font-bold text-orange-600">
-									{scanResult.totalPlagiarismWords}
+								<div className="text-sm">Credits Remaining</div>
+							</CardContent>
+						</Card>
+						<Card
+							className={isDarkMode ? "dark:bg-gray-900/70" : ""}
+						>
+							<CardContent className="p-4 text-center">
+								<div className="text-2xl font-bold text-red-600">
+									{2500 - creditsRemaining}
 								</div>
-								<div className="text-sm">Matching Words</div>
-							</div>
-						</div>
-					</CardContent>
-				</Card>
+								<div className="text-sm">Credits Used</div>
+							</CardContent>
+						</Card>
+					</div>
+				</>
 			)}
 
 			<div className="space-y-2">
